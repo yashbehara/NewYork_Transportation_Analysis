@@ -1,0 +1,16 @@
+﻿Street,Grand Central,Times Square,Union Square,Penn Station,Herald Square,14th Street,World Trade Center,Fulton Street,5th Avenue,Broadway,Park Avenue,Lexington Avenue,Madison Avenue,7th Avenue,8th Avenue
+Grand Central,0,40,55,50,65,50,0,0,67,57,50,42,50,65,72
+Times Square,40,0,40,50,45,47,60,57,60,50,42,35,42,57,63
+Union Square,55,40,0,52,68,52,77,75,77,64,55,42,60,75,80
+Penn Station,50,50,52,0,68,52,75,72,75,64,55,42,60,70,75
+Herald Square,65,45,68,68,0,55,72,70,72,60,51,0,60,70,77
+14th Street,50,47,52,52,55,0,65,62,67,55,47,37,47,57,65
+World Trade Center,0,60,77,75,72,65,0,52,0,58,50,40,50,63,70
+Fulton Street,0,57,75,72,70,63,52,0,60,50,40,32,40,52,58
+5th Avenue,67,60,77,75,72,67,0,60,0,70,60,50,60,72,77
+Broadway,57,50,64,64,60,55,58,50,70,0,52,42,52,64,70
+Park Avenue,50,42,55,55,0,50,45,37,63,52,0,32,42,50,55
+Lexington Avenue,42,35,42,42,0,42,37,32,50,42,32,0,32,37,42
+Madison Avenue,50,42,60,60,60,47,50,42,60,52,42,32,0,42,50
+7th Avenue,65,57,75,70,70,57,63,52,72,64,50,42,42,0,45
+8th Avenue,72,63,80,75,77,65,70,58,77,70,55,50,58,45,0

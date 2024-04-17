@@ -1,0 +1,16 @@
+﻿Street,Grand Central,Times Square,Union Square,Penn Station,Herald Square,14th Street,World Trade Center,Fulton Street,5th Avenue,Broadway,Park Avenue,Lexington Avenue,Madison Avenue,7th Avenue,8th Avenue
+Grand Central,0,4,6,5,7,5,0,0,8,6,5,4,5,7,8
+Times Square,4,0,4,5,4,4,6,6,6,5,4,3,4,6,7
+Union Square,6,4,0,5,7,5,8,8,8,6,5,4,6,8,8
+Penn Station,5,5,5,0,7,5,8,8,8,6,5,4,6,7,8
+Herald Square,7,4,7,7,0,5,7,7,7,6,5,0,6,7,8
+14th Street,5,4,5,5,5,0,7,7,7,6,5,4,5,6,7
+World Trade Center,0,6,8,8,7,7,0,5,0,6,5,4,5,6,7
+Fulton Street,0,6,8,8,7,7,5,0,6,5,4,3,4,5,6
+5th Avenue,8,6,8,8,7,7,0,6,0,7,6,5,6,7,8
+Broadway,6,5,6,6,6,6,6,5,7,0,5,4,5,6,7
+Park Avenue,5,4,5,5,0,5,4,3,6,5,0,3,4,5,5
+Lexington Avenue,4,3,4,4,0,4,3,3,5,4,3,0,3,4,4
+Madison Avenue,5,4,6,6,6,5,5,4,6,5,4,3,0,4,5
+7th Avenue,7,6,8,7,7,6,6,5,7,6,5,4,4,0,4
+8th Avenue,8,7,8,8,8,7,7,6,8,7,5,5,5,4,0
