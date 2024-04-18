@@ -12,58 +12,54 @@ import java.util.*;
 public class NewYork_Transportation {
 
     public static void main(String[] args) {
-        Graph graph = loadGraphFromDataset(getUserDatasetChoice());
-        String sourceStreet = "5th Avenue";
+        int datasetChoice = getUserDatasetChoice();
+        Graph graph = loadGraphFromDataset(datasetChoice);
+        Scanner scanner = new Scanner(System.in);
 
-        // Algorithm 1 : Dijkstra's Algorithm
-        Map<String, Double> shortestDistances = dijkstra(graph, sourceStreet);
-        System.out.println("Shortest distances from " + sourceStreet + ":");
-        for (Map.Entry<String, Double> entry : shortestDistances.entrySet()) {
-            System.out.println(entry.getKey() + ": " + entry.getValue());
-        }
-
-        // Algorithm 2 : Kruskal's Algorithm
-        Set<Edge> mstEdges = kruskalMST(graph);
-        System.out.println("Edges of Minimum Spanning Tree:");
-        for (Edge edge : mstEdges) {
-            System.out.println(edge);
-        }
-
-        // Algorithm 3: Floyd-Warshall Algorithm
-        int[][] shortestDistancesMatrix = floydWarshall(graph);
-        System.out.println("Shortest distances between every pair of stations:");
-        Set<String> stations = graph.getVertices();
-        for (int i = 0; i < shortestDistancesMatrix.length; i++) {
-            System.out.println("From " + stations.toArray()[i]);
-            for (int j = 0; j < shortestDistancesMatrix[i].length; j++) {
-                 if (i != j) {
-                       System.out.println("To " + stations.toArray()[j] + ": " + shortestDistancesMatrix[i][j]);
-                 }
+        while (true) {
+            int planChoice = getUserPlanChoice();
+            switch (planChoice) {
+                case 1:
+                    handleSingleStation(graph);
+                    break;
+                case 2:
+                    handleOptimalRoute(graph);
+                    break;
+                case 3:
+                    handleCompleteNetwork(graph);
+                    break;
+                default:
+                    System.out.println("Invalid plan choice. Please try again.");
+            }
+            System.out.println("\n");
+            System.out.println("Do you want to continue? (yes/no)");
+            String continueChoice = scanner.next();
+            if (!continueChoice.equalsIgnoreCase("yes")) {
+                break;
             }
         }
-        System.out.println();
     }
-
+    
     public static Graph loadGraphFromDataset(int datasetChoice) {
         String csvFile = "";
         switch (datasetChoice) {
             case 1:
-                csvFile = "/Users/yash/Documents/Sem_2/PSA/Final Project/Datasets/Cost_Dataset.csv";
+                csvFile = "/Users/yash/NetBeansProjects/NewYork_Transportation/src/newyork_transportation/Cost_Dataset.csv";
                 break;
             case 2:
-                csvFile = "/Users/yash/Documents/Sem_2/PSA/Final Project/Datasets/Distance_Dataset.csv";
+                csvFile = "/Users/yash/NetBeansProjects/NewYork_Transportation/src/newyork_transportation/Distance_Dataset.csv";
                 break;
             case 3:
-                csvFile = "/Users/yash/Documents/Sem_2/PSA/Final Project/Datasets/Time_Dataset.csv";
+                csvFile = "/Users/yash/NetBeansProjects/NewYork_Transportation/src/newyork_transportation/Time_Dataset.csv";
                 break;
             case 4:
-                csvFile = "/Users/yash/Documents/Sem_2/PSA/Final Project/Datasets/CTD_Dataset.csv";
+                csvFile = "/Users/yash/NetBeansProjects/NewYork_Transportation/src/newyork_transportation/CTD_Dataset.csv";
                 break;
             case 5:
-                csvFile = "/Users/yash/Documents/Sem_2/PSA/Final Project/Datasets/DTC_Dataset.csv";
+                csvFile = "/Users/yash/NetBeansProjects/NewYork_Transportation/src/newyork_transportation/DTC_Dataset.csv";
                 break;
             case 6:
-                csvFile = "/Users/yash/Documents/Sem_2/PSA/Final Project/Datasets/TCD_Dataset.csv";
+                csvFile = "/Users/yash/NetBeansProjects/NewYork_Transportation/src/newyork_transportation/TCD_Dataset.csv";
                 break;
             default:
                 throw new IllegalArgumentException("Invalid dataset choice.");
@@ -96,11 +92,77 @@ public class NewYork_Transportation {
 
         return graph;
     }
+    
+    public static int getUserPlanChoice() {
+            Scanner scanner = new Scanner(System.in);
+            System.out.println("Choose a plan (Single Station : 1, Optimal Route : 2, Complete Network : 3):");
+            return scanner.nextInt();
+    }
+    
+    
+    public static void handleSingleStation(Graph graph) {
+            Scanner scanner = new Scanner(System.in);
+
+            // List all stations
+            System.out.println("List of stations:");
+            Set<String> stationsList = graph.getVertices();
+            for (String station : stationsList) {
+                System.out.println(station);
+            }
+            // Prompt user to choose source station
+            String sourceStreet;
+            boolean validStation = false;
+            do {
+                System.out.println("\n");
+                System.out.println("Choose a source station:");
+                sourceStreet = scanner.nextLine();
+                if (stationsList.contains(sourceStreet)) {
+                    validStation = true;
+                } else {
+                    System.out.println("Please enter a valid station.");
+                }
+            } while (!validStation);
+
+            // Algorithm 1 : Dijkstra's Algorithm
+            Map<String, Double> shortestDistances = dijkstra(graph, sourceStreet);
+            System.out.println("\n");
+
+            System.out.println("Shortest distances from " + sourceStreet + ":");
+            for (Map.Entry<String, Double> entry : shortestDistances.entrySet()) {
+                System.out.println(entry.getKey() + ": " + entry.getValue());
+            }
+            System.out.println("\n");
+        }
+
+    public static void handleOptimalRoute(Graph graph) {
+            Set<Edge> mstEdges = kruskalMST(graph);
+            System.out.println("Minimum cost to cover all the stations:");
+            System.out.println("\n");
+
+            for (Edge edge : mstEdges) {
+                System.out.println(edge);
+            }
+        }
+
+    public static void handleCompleteNetwork(Graph graph) {
+            int[][] shortestDistancesMatrix = floydWarshall(graph);
+            System.out.println("Shortest distances between every pair of stations:");
+            Set<String> stations = graph.getVertices();
+            for (int i = 0; i < shortestDistancesMatrix.length; i++) {
+                System.out.println("\nFrom " + stations.toArray()[i]);
+                for (int j = 0; j < shortestDistancesMatrix[i].length; j++) {
+                    if (i != j) {
+                        System.out.println("To " + stations.toArray()[j] + ": " + shortestDistancesMatrix[i][j]);
+                    }
+                }
+            }
+    }
+
 
     public static int getUserDatasetChoice() {
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Choose a dataset (Cost : 1, Distance : 2, Time : 3, CTD (Cost, Time, Distance): 4, DTC (Distance, Time, Cost): 5, TCD (Time, Cost, Distance): 6");
-        return scanner.nextInt();
+            Scanner scanner = new Scanner(System.in);
+            System.out.println("Choose a dataset (Cost : 1, Distance : 2, Time : 3, CTD (Cost, Time, Distance): 4, DTC (Distance, Time, Cost): 5, TCD (Time, Cost, Distance): 6");
+            return scanner.nextInt();
     }
 
     public static Map<String, Double> dijkstra(Graph graph, String source) {
@@ -176,48 +238,49 @@ public class NewYork_Transportation {
         return mst;
     }
 
-public static int[][] floydWarshall(Graph graph) {
-    int n = graph.getVertices().size();
-    int[][] distances = new int[n][n];
+    public static int[][] floydWarshall(Graph graph) {
+        int n = graph.getVertices().size();
+        int[][] distances = new int[n][n];
 
-    // Initialize distances array with infinity
-    int infinity = Integer.MAX_VALUE / 2; // Avoid overflow
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
-            distances[i][j] = infinity;
-        }
-    }
-
-    // Fill in initial distances based on the graph
-    for (String source : graph.getVertices()) {
-        int sourceIndex = getIndex(graph.getVertices(), source);
-        Map<String, Double> neighbors = graph.adjacencyList.get(source);
-        if (neighbors != null) {
-            for (Map.Entry<String, Double> neighborEntry : neighbors.entrySet()) {
-                String destination = neighborEntry.getKey();
-                double weight = neighborEntry.getValue();
-                if (weight != 0.0) { // Skip 0 weights
-                    int destinationIndex = getIndex(graph.getVertices(), destination);
-                    distances[sourceIndex][destinationIndex] = (int) weight;
-                }
-            }
-        }
-    }
-
-    // Apply Floyd-Warshall algorithm
-    for (int k = 0; k < n; k++) {
+        // Initialize distances array with infinity
+        int infinity = Integer.MAX_VALUE / 2; // Avoid overflow
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
-                if (distances[i][k] != infinity && distances[k][j] != infinity &&
-                        distances[i][k] + distances[k][j] < distances[i][j]) {
-                    distances[i][j] = distances[i][k] + distances[k][j];
+                distances[i][j] = infinity;
+            }
+        }
+
+        // Fill in initial distances based on the graph
+        for (String source : graph.getVertices()) {
+            int sourceIndex = getIndex(graph.getVertices(), source);
+            Map<String, Double> neighbors = graph.adjacencyList.get(source);
+            if (neighbors != null) {
+                for (Map.Entry<String, Double> neighborEntry : neighbors.entrySet()) {
+                    String destination = neighborEntry.getKey();
+                    double weight = neighborEntry.getValue();
+                    if (weight != 0.0) { // Skip 0 weights
+                        int destinationIndex = getIndex(graph.getVertices(), destination);
+                        distances[sourceIndex][destinationIndex] = (int) weight;
+                    }
                 }
             }
         }
-    }
 
-    return distances;
-}
+        // Apply Floyd-Warshall algorithm
+        for (int k = 0; k < n; k++) {
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < n; j++) {
+                    if (distances[i][k] != infinity && distances[k][j] != infinity &&
+                            distances[i][k] + distances[k][j] < distances[i][j]) {
+                        distances[i][j] = distances[i][k] + distances[k][j];
+                    }
+                }
+            }
+        }
+
+        return distances;
+    }
+    
     public static int getIndex(Set<String> vertices, String vertex) {
         int index = 0;
         for (String v : vertices) {
