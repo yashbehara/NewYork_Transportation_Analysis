@@ -6,13 +6,16 @@ package newyork_transportation;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.text.DecimalFormat;
 
 import java.util.*;
 
 public class NewYork_Transportation {
-
+    
+    private static int currentDatasetChoice;
     public static void main(String[] args) {
         int datasetChoice = getUserDatasetChoice();
+        currentDatasetChoice = datasetChoice;
         Graph graph = loadGraphFromDataset(datasetChoice);
         Scanner scanner = new Scanner(System.in);
 
@@ -95,44 +98,88 @@ public class NewYork_Transportation {
     
     public static int getUserPlanChoice() {
             Scanner scanner = new Scanner(System.in);
-            System.out.println("Choose a plan (Single Station : 1, Optimal Route : 2, Complete Network : 3):");
+            System.out.println("\nChoose a plan (Single Station : 1, Optimal Route : 2, Complete Network : 3):");
             return scanner.nextInt();
     }
     
     
     public static void handleSingleStation(Graph graph) {
-            Scanner scanner = new Scanner(System.in);
+        Scanner scanner = new Scanner(System.in);
 
-            // List all stations
-            System.out.println("List of stations:");
-            Set<String> stationsList = graph.getVertices();
-            for (String station : stationsList) {
-                System.out.println(station);
+        // List all stations
+        System.out.println("List of stations:");
+        Set<String> stationsList = graph.getVertices();
+        for (String station : stationsList) {
+            System.out.println(station);
+        }
+
+        // Prompt user to choose source station
+        String sourceStreet;
+        boolean validStation = false;
+        do {
+            System.out.println("\nChoose a source station:");
+            sourceStreet = scanner.nextLine();
+            if (stationsList.contains(sourceStreet)) {
+                validStation = true;
+            } else {
+                System.out.println("Please enter a valid station.");
             }
-            // Prompt user to choose source station
-            String sourceStreet;
-            boolean validStation = false;
-            do {
-                System.out.println("\n");
-                System.out.println("Choose a source station:");
-                sourceStreet = scanner.nextLine();
-                if (stationsList.contains(sourceStreet)) {
-                    validStation = true;
-                } else {
-                    System.out.println("Please enter a valid station.");
-                }
-            } while (!validStation);
+        } while (!validStation);
 
-            // Algorithm 1 : Dijkstra's Algorithm
+        // Prompt user to choose analysis type
+        int analysisChoice;
+        do {
+            System.out.println("\nChoose analysis type:");
+            System.out.println("1. Direct Analysis");
+            System.out.println("2. Balanced Analysis of Cost, Distance, and Time");
+            analysisChoice = scanner.nextInt();
+            if (analysisChoice != 1 && analysisChoice != 2) {
+                System.out.println("Invalid choice. Please enter 1 or 2.");
+            }
+        } while (analysisChoice != 1 && analysisChoice != 2);
+
+        if (analysisChoice == 1) {
+            // Algorithm 1: Dijkstra's Algorithm
             Map<String, Double> shortestDistances = dijkstra(graph, sourceStreet);
-            System.out.println("\n");
-
-            System.out.println("Shortest distances from " + sourceStreet + ":");
+            System.out.println("\nShortest distances from " + sourceStreet + ":");
             for (Map.Entry<String, Double> entry : shortestDistances.entrySet()) {
                 System.out.println(entry.getKey() + ": " + entry.getValue());
             }
-            System.out.println("\n");
+        } else if (analysisChoice == 2) {
+            // Algorithm 2: Balanced Analysis of Cost, Distance, and Time
+            Map<String, Double> averageShortestDistances = performBalancedAnalysis(graph, sourceStreet);
+            System.out.println("\nAverage shortest distances from " + sourceStreet + ":");
+            for (Map.Entry<String, Double> entry : averageShortestDistances.entrySet()) {
+                System.out.println(entry.getKey() + ": " + entry.getValue());
+            }
         }
+    }
+    //    Method to perform Balanced analysis ( avg of cost, time and distance ) on Dijkstra's algorithm
+    public static Map<String, Double> performBalancedAnalysis(Graph graph, String sourceStreet) {
+        Map<String, Double> averageShortestDistances = new HashMap<>();
+
+        // Perform Dijkstra's algorithm for each dataset and calculate average shortest distances
+        for (int i = 1; i <= 3; i++) {
+            Graph datasetGraph = loadGraphFromDataset(i);
+            Map<String, Double> shortestDistances = dijkstra(datasetGraph, sourceStreet);
+
+            for (Map.Entry<String, Double> entry : shortestDistances.entrySet()) {
+                String station = entry.getKey();
+                double distance = entry.getValue();
+                averageShortestDistances.merge(station, distance, Double::sum);
+            }
+        }
+
+        // Calculate average distances and round to two decimal points
+        DecimalFormat df = new DecimalFormat("#.##");
+        for (Map.Entry<String, Double> entry : averageShortestDistances.entrySet()) {
+            double averageDistance = entry.getValue() / 3; // Dividing by 3 since we analyzed 3 datasets
+            String roundedDistance = df.format(averageDistance);
+            entry.setValue(Double.parseDouble(roundedDistance));
+        }
+
+        return averageShortestDistances;
+    }
 
     public static void handleOptimalRoute(Graph graph) {
             Set<Edge> mstEdges = kruskalMST(graph);
@@ -142,6 +189,9 @@ public class NewYork_Transportation {
             for (Edge edge : mstEdges) {
                 System.out.println(edge);
             }
+            
+            // Perform analysis
+            performAnalysis(mstEdges);
         }
 
     public static void handleCompleteNetwork(Graph graph) {
@@ -363,4 +413,60 @@ public class NewYork_Transportation {
             }
         }
     }
+    
+    public static void performAnalysis(Set<Edge> mstEdges) {
+        // Total cost, distance, or time
+        double totalValue = 0.0;
+
+        // Longest and shortest edge
+        Edge longestEdge = null;
+        Edge shortestEdge = null;
+
+        // Station connectivity
+        Map<String, Integer> stationConnectivity = new HashMap<>();
+
+        // Initialize average edge weight
+        double totalEdgeWeight = 0.0;
+        int edgeCount = 0;
+
+        // Iterate through the edges in the MST
+        for (Edge edge : mstEdges) {
+            // Update total value (cost, distance, or time)
+            totalValue += edge.weight;
+
+            // Update longest and shortest edge
+            if (longestEdge == null || edge.weight > longestEdge.weight) {
+                longestEdge = edge;
+            }
+            if (shortestEdge == null || edge.weight < shortestEdge.weight) {
+                shortestEdge = edge;
+            }
+
+            // Update station connectivity
+            stationConnectivity.put(edge.source, stationConnectivity.getOrDefault(edge.source, 0) + 1);
+            stationConnectivity.put(edge.destination, stationConnectivity.getOrDefault(edge.destination, 0) + 1);
+
+            // Update average edge weight
+            totalEdgeWeight += edge.weight;
+            edgeCount++;
+        }
+
+        // Calculate average edge weight
+        double averageEdgeWeight = totalEdgeWeight / edgeCount;
+
+        // Display analysis results
+        System.out.println("\nAnalysis Results:");
+        
+        System.out.println("\n1. Total Cost of the path: " + totalValue);
+
+
+        System.out.println("\n2. Longest Edge: " + longestEdge);
+        System.out.println("   Shortest Edge: " + shortestEdge);
+        System.out.println("\n3. Average Edge Weight: " + averageEdgeWeight);
+        System.out.println("\n4. Station Connectivity:");
+        for (Map.Entry<String, Integer> entry : stationConnectivity.entrySet()) {
+            System.out.println("   " + entry.getKey() + ": " + entry.getValue() + " connections");
+        }
+    }
+
 }
