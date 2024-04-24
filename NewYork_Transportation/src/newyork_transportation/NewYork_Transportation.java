@@ -7,12 +7,12 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.text.DecimalFormat;
-
 import java.util.*;
 
 public class NewYork_Transportation {
-    
+
     private static int currentDatasetChoice;
+
     public static void main(String[] args) {
         int datasetChoice = getUserDatasetChoice();
         currentDatasetChoice = datasetChoice;
@@ -31,18 +31,26 @@ public class NewYork_Transportation {
                 case 3:
                     handleCompleteNetwork(graph);
                     break;
+                case 4:
+                    dfs(graph);
+                    break;
+                case 5:
+                    bfs(graph);
+                    break;
                 default:
                     System.out.println("Invalid plan choice. Please try again.");
             }
             System.out.println("\n");
+
             System.out.println("Do you want to continue? (yes/no)");
             String continueChoice = scanner.next();
             if (!continueChoice.equalsIgnoreCase("yes")) {
                 break;
             }
+            
         }
     }
-    
+
     public static Graph loadGraphFromDataset(int datasetChoice) {
         String csvFile = "";
         switch (datasetChoice) {
@@ -95,14 +103,13 @@ public class NewYork_Transportation {
 
         return graph;
     }
-    
+
     public static int getUserPlanChoice() {
-            Scanner scanner = new Scanner(System.in);
-            System.out.println("\nChoose a plan (Single Station : 1, Optimal Route : 2, Complete Network : 3):");
-            return scanner.nextInt();
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("\nChoose a plan (1. Single Station, 2. Optimal Route, 3. Complete Network, 4. DFS Traversal, 5. BFS Traversal)");
+        return scanner.nextInt();
     }
-    
-    
+
     public static void handleSingleStation(Graph graph) {
         Scanner scanner = new Scanner(System.in);
 
@@ -154,7 +161,8 @@ public class NewYork_Transportation {
             }
         }
     }
-    //    Method to perform Balanced analysis ( avg of cost, time and distance ) on Dijkstra's algorithm
+
+    // Method to perform Balanced analysis ( avg of cost, time and distance ) on Dijkstra's algorithm
     public static Map<String, Double> performBalancedAnalysis(Graph graph, String sourceStreet) {
         Map<String, Double> averageShortestDistances = new HashMap<>();
 
@@ -182,37 +190,37 @@ public class NewYork_Transportation {
     }
 
     public static void handleOptimalRoute(Graph graph) {
-            Set<Edge> mstEdges = kruskalMST(graph);
-            System.out.println("Minimum cost to cover all the stations:");
-            System.out.println("\n");
+        Set<Edge> mstEdges = kruskalMST(graph);
+        System.out.println("Minimum cost to cover all the stations:");
+        System.out.println("\n");
 
-            for (Edge edge : mstEdges) {
-                System.out.println(edge);
-            }
-            
-            // Perform analysis
-            performAnalysis(mstEdges);
+        for (Edge edge : mstEdges) {
+            System.out.println(edge);
         }
 
+        // Perform analysis
+        performAnalysis(mstEdges);
+    }
+
     public static void handleCompleteNetwork(Graph graph) {
-            int[][] shortestDistancesMatrix = floydWarshall(graph);
-            System.out.println("Shortest distances between every pair of stations:");
-            Set<String> stations = graph.getVertices();
-            for (int i = 0; i < shortestDistancesMatrix.length; i++) {
-                System.out.println("\nFrom " + stations.toArray()[i]);
-                for (int j = 0; j < shortestDistancesMatrix[i].length; j++) {
-                    if (i != j) {
-                        System.out.println("To " + stations.toArray()[j] + ": " + shortestDistancesMatrix[i][j]);
-                    }
+        int[][] shortestDistancesMatrix = floydWarshall(graph);
+        System.out.println("Shortest distances between every pair of stations:");
+        Set<String> stations = graph.getVertices();
+        for (int i = 0; i < shortestDistancesMatrix.length; i++) {
+            System.out.println("\nFrom " + stations.toArray()[i]);
+            for (int j = 0; j < shortestDistancesMatrix[i].length; j++) {
+                if (i != j) {
+                    System.out.println("To " + stations.toArray()[j] + ": " + shortestDistancesMatrix[i][j]);
                 }
             }
+        }
     }
 
 
     public static int getUserDatasetChoice() {
-            Scanner scanner = new Scanner(System.in);
-            System.out.println("Choose a dataset (Cost : 1, Distance : 2, Time : 3, CTD (Cost, Time, Distance): 4, DTC (Distance, Time, Cost): 5, TCD (Time, Cost, Distance): 6");
-            return scanner.nextInt();
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Choose a dataset (Cost : 1, Distance : 2, Time : 3, CTD (Cost, Time, Distance): 4, DTC (Distance, Time, Cost): 5, TCD (Time, Cost, Distance): 6");
+        return scanner.nextInt();
     }
 
     public static Map<String, Double> dijkstra(Graph graph, String source) {
@@ -330,7 +338,7 @@ public class NewYork_Transportation {
 
         return distances;
     }
-    
+
     public static int getIndex(Set<String> vertices, String vertex) {
         int index = 0;
         for (String v : vertices) {
@@ -413,7 +421,7 @@ public class NewYork_Transportation {
             }
         }
     }
-    
+
     public static void performAnalysis(Set<Edge> mstEdges) {
         // Total cost, distance, or time
         double totalValue = 0.0;
@@ -456,7 +464,7 @@ public class NewYork_Transportation {
 
         // Display analysis results
         System.out.println("\nAnalysis Results:");
-        
+
         System.out.println("\n1. Total Cost of the path: " + totalValue);
 
 
@@ -469,4 +477,64 @@ public class NewYork_Transportation {
         }
     }
 
+    // Method to perform Depth-First Search (DFS) traversal
+    public static void dfs(Graph graph) {
+        Scanner scanner = new Scanner(System.in);
+
+         // Prompt user for the starting station
+        System.out.println("Enter the starting station:");
+        String startStation = scanner.nextLine();
+
+        // Prompt user for the station to avoid
+        System.out.println("Enter the station to avoid:");
+        String stationToAvoid = scanner.nextLine();
+
+        // Perform DFS traversal while avoiding the specified station
+        System.out.println("\nDFS Traversal (Avoiding " + stationToAvoid + "):");
+        Set<String> visited = new HashSet<>();
+        dfsWithAvoidance(graph, startStation, stationToAvoid, visited);
+    }
+
+    private static void dfsWithAvoidance(Graph graph, String source, String stationToAvoid, Set<String> visited) {
+        visited.add(source);
+        System.out.print(source + " ");
+
+        Map<String, Double> neighbors = graph.adjacencyList.get(source);
+        if (neighbors != null) {
+            for (String neighbor : neighbors.keySet()) {
+                if (!visited.contains(neighbor) && !neighbor.equals(stationToAvoid)) {
+                    dfsWithAvoidance(graph, neighbor, stationToAvoid, visited);
+                }
+            }
+        }
+    }
+
+    // Method to perform Breadth-First Search (BFS) traversal
+    public static void bfs(Graph graph) {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("\nBFS Traversal:");
+        System.out.println("Enter the starting station:");
+        String startBFS = scanner.nextLine(); // Read the station name and trim whitespace
+         
+        Set<String> visited = new HashSet<>();
+        Queue<String> queue = new LinkedList<>();
+        visited.add(startBFS);
+        queue.offer(startBFS);
+
+        while (!queue.isEmpty()) {
+            String current = queue.poll();
+            System.out.print(current + " ");
+
+            Map<String, Double> neighbors = graph.adjacencyList.get(current);
+            if (neighbors != null) {
+                for (String neighbor : neighbors.keySet()) {
+                    if (!visited.contains(neighbor)) {
+                        visited.add(neighbor);
+                        queue.offer(neighbor);
+                    }
+                }
+            }
+        }
+    }
 }
